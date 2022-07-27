@@ -34,3 +34,45 @@ func ExamplePtr() {
 	// int64Pointer is of type *int64 and points to value 22
 	// funcReturn is of type *string and points to value 99
 }
+
+func TestValue(t *testing.T) {
+	tests := []struct {
+		pointer   *string
+		wantValue string
+	}{
+		{
+			nil,
+			"",
+		},
+		{
+			Ptr("foo"),
+			"foo",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprint(tt.pointer), func(t *testing.T) {
+			if gotValue := Value(tt.pointer); gotValue != tt.wantValue {
+				t.Errorf("Value() = %v, want %v", gotValue, tt.wantValue)
+			}
+		})
+	}
+}
+
+func ExampleValue() {
+	type document struct {
+		ID          *int    `json:"id,omitempty"`
+		Description *string `json:"description,omitempty"`
+	}
+
+	d := document{
+		Description: Ptr("foobar"),
+	}
+
+	// this would panic, d.ID is nil
+	// fmt.Println(*d.ID, *d.Description)
+
+	// d.ID is nil, so a 0 is printed
+	fmt.Println(Value(d.ID), Value(d.Description))
+
+	// Output: 0 foobar
+}
