@@ -65,3 +65,28 @@ func Transform[A any, B any](as []A, transFunc func(A) B) []B {
 
 	return out
 }
+
+// TransformErr is similar to Transform,
+// but it uses a transFunc that can return an error.
+//
+// TranformErr will fail on the first error returned
+// and returns a wrapped error with index information,
+// along with a partial slice from previous succesfull operations.
+func TransformErr[A any, B any](as []A, transFunc func(A) (B, error)) ([]B, error) {
+	if as == nil {
+		return nil, nil
+	}
+
+	out := make([]B, 0, len(as))
+
+	for i, a := range as {
+		b, err := transFunc(a)
+		if err != nil {
+			return out, fmt.Errorf("transform index %d: %w", i, err)
+		}
+
+		out = append(out, b)
+	}
+
+	return out, nil
+}

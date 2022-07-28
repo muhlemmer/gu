@@ -200,7 +200,7 @@ func TestTransform(t *testing.T) {
 	}
 }
 
-func ExampleTransform_strconv() {
+func ExampleTransform_itoa() {
 	in := []int{1, 2, 3, 4, 5}
 
 	out := Transform(in, strconv.Itoa)
@@ -248,4 +248,69 @@ func ExampleTransform_struct() {
 
 	fmt.Printf("out is of type %T and contains %v", out, out)
 	// Output: out is of type []gu.B and contains [{1 Hello, World!} {2 foo, bar} {3 spanac}]
+}
+
+func TestTransformErr(t *testing.T) {
+	tests := []struct {
+		name    string
+		as      []string
+		want    []int
+		wantErr bool
+	}{
+		{
+			"nil",
+			nil,
+			nil,
+			false,
+		},
+		{
+			"succes",
+			[]string{"1", "2", "3", "4", "5"},
+			[]int{1, 2, 3, 4, 5},
+			false,
+		},
+		{
+			"error",
+			[]string{"1", "2", "foo", "4", "5"},
+			[]int{1, 2},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := TransformErr(tt.as, strconv.Atoi)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TransformErr() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("TransformErr() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func ExampleTransformErr_atoi() {
+	in := []string{"1", "2", "3", "4", "5"}
+
+	out, err := TransformErr(in, strconv.Atoi)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("out is of type %T and contains %v\n", out, out)
+
+	// this will cause an error
+	in = []string{"1", "2", "foo", "4", "5"}
+
+	out, err = TransformErr(in, strconv.Atoi)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("out is of type %T and contains %v\n", out, out)
+
+	// Output: out is of type []int and contains [1 2 3 4 5]
+	// transform index 2: strconv.Atoi: parsing "foo": invalid syntax
+	// out is of type []int and contains [1 2]
 }
