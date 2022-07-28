@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -131,10 +132,27 @@ func ExampleAssertInterfacesP() {
 }
 
 func TestTransform(t *testing.T) {
+	type testA struct {
+		ID int32
+		S  []string
+	}
+
+	type testB struct {
+		ID int64
+		S  string
+	}
+
+	transFunc := func(a testA) testB {
+		return testB{
+			ID: int64(a.ID),
+			S:  strings.Join(a.S, ", "),
+		}
+	}
+
 	tests := []struct {
 		name string
-		as   []ExampleA
-		want []ExampleB
+		as   []testA
+		want []testB
 	}{
 		{
 			"nil",
@@ -143,7 +161,7 @@ func TestTransform(t *testing.T) {
 		},
 		{
 			"entries",
-			[]ExampleA{
+			[]testA{
 				{
 					ID: 1,
 					S:  []string{"Hello", "World!"},
@@ -157,7 +175,7 @@ func TestTransform(t *testing.T) {
 					S:  []string{"spanac"},
 				},
 			},
-			[]ExampleB{
+			[]testB{
 				{
 					ID: 1,
 					S:  "Hello, World!",
@@ -175,9 +193,59 @@ func TestTransform(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Transform[ExampleB](tt.as); !reflect.DeepEqual(got, tt.want) {
+			if got := Transform(tt.as, transFunc); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Transform() = %v, want %v", got, tt.want)
 			}
 		})
 	}
+}
+
+func ExampleTransform_strconv() {
+	in := []int{1, 2, 3, 4, 5}
+
+	out := Transform(in, strconv.Itoa)
+	fmt.Printf("out is of type %T and contains %v", out, out)
+
+	// Output: out is of type []string and contains [1 2 3 4 5]
+}
+
+func ExampleTransform_struct() {
+	type A struct {
+		ID int32
+		S  []string
+	}
+
+	type B struct {
+		ID int64
+		S  string
+	}
+
+	// define a tranformer function
+	transFunc := func(a A) B {
+		return B{
+			ID: int64(a.ID),
+			S:  strings.Join(a.S, ", "),
+		}
+	}
+
+	in := []A{
+		{
+			ID: 1,
+			S:  []string{"Hello", "World!"},
+		},
+		{
+			ID: 2,
+			S:  []string{"foo", "bar"},
+		},
+		{
+			ID: 3,
+			S:  []string{"spanac"},
+		},
+	}
+
+	// create the transformed slice
+	out := Transform(in, transFunc)
+
+	fmt.Printf("out is of type %T and contains %v", out, out)
+	// Output: out is of type []gu.B and contains [{1 Hello, World!} {2 foo, bar} {3 spanac}]
 }

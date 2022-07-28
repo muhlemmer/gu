@@ -46,20 +46,13 @@ func AssertInterfacesP[T any](is []interface{}) []T {
 	return out
 }
 
-// A transformer copies values into a new instance of 'B'.
-// How values are copied is up to the implementation.
-type Transformer[B any] interface {
-	Transform() B
-}
-
-// Transform a slice of type 'A' to a slice of type 'B'.
-// 'A' must implement the Tranformer interface,
-// which returns a single instance of 'B'.
+// Transform a slice of type 'A' to a slice of type 'B',
+// by calling transFunc for each entry.
 //
 // Usefull when working with slices of different, but similar,
 // struct types and you don't want to write the 'for' loops
 // over and over again.
-func Transform[B any, A Transformer[B]](as []A) []B {
+func Transform[A any, B any](as []A, transFunc func(A) B) []B {
 	if as == nil {
 		return nil
 	}
@@ -67,7 +60,7 @@ func Transform[B any, A Transformer[B]](as []A) []B {
 	out := make([]B, len(as))
 
 	for i, a := range as {
-		out[i] = a.Transform()
+		out[i] = transFunc(a)
 	}
 
 	return out
