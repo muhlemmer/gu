@@ -129,3 +129,55 @@ func ExampleAssertInterfacesP() {
 
 	// Output: Hello, World!
 }
+
+func TestTransform(t *testing.T) {
+	tests := []struct {
+		name string
+		as   []ExampleA
+		want []ExampleB
+	}{
+		{
+			"nil",
+			nil,
+			nil,
+		},
+		{
+			"entries",
+			[]ExampleA{
+				{
+					ID: 1,
+					S:  []string{"Hello", "World!"},
+				},
+				{
+					ID: 2,
+					S:  []string{"foo", "bar"},
+				},
+				{
+					ID: 3,
+					S:  []string{"spanac"},
+				},
+			},
+			[]ExampleB{
+				{
+					ID: 1,
+					S:  "Hello, World!",
+				},
+				{
+					ID: 2,
+					S:  "foo, bar",
+				},
+				{
+					ID: 3,
+					S:  "spanac",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Transform[ExampleB](tt.as); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Transform() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
