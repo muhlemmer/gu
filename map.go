@@ -26,3 +26,45 @@ func MapEqual[K, V comparable](a, b map[K]V) bool {
 	return true
 }
 
+// MapCopy copies all the entries of src into a new map.
+// Nil is returned when src is nil.
+// Note that if V is a pointer or reference type,
+// it is only shallow copied.
+func MapCopy[K comparable, V any](src map[K]V) map[K]V {
+	if src == nil {
+		return nil
+	}
+
+	dst := make(map[K]V, len(src))
+
+	for k, v := range src {
+		dst[k] = v
+	}
+
+	return dst
+}
+
+// MapCopyKeys copies the entries or src,
+// identified by keys into a new map.
+// Nil is returned when src is nil.
+//
+// If no keys are provided and src is not nil,
+// an empty non-nil map is returned.
+//
+// Note that if V is a pointer or reference type,
+// it is only shallow copied.
+func MapCopyKeys[K comparable, V any](src map[K]V, keys ...K) map[K]V {
+	if src == nil {
+		return nil
+	}
+
+	dst := make(map[K]V, len(keys))
+
+	for _, k := range keys {
+		if v, ok := src[k]; ok {
+			dst[k] = v
+		}
+	}
+
+	return dst
+}

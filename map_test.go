@@ -85,3 +85,110 @@ func TestMapEqual(t *testing.T) {
 	}
 }
 
+func TestMapCopy(t *testing.T) {
+	tests := []struct {
+		name string
+		src  map[int]int
+	}{
+		{
+			"nil",
+			nil,
+		},
+		{
+			"empty",
+			map[int]int{},
+		},
+		{
+			"values",
+			map[int]int{
+				1: 2,
+				3: 4,
+				5: 6,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if dst := MapCopy(tt.src); !MapEqual(dst, tt.src) {
+				t.Errorf("MapCopy =\n%v\nwant\n%v", dst, tt.src)
+			}
+		})
+	}
+}
+
+func TestMapCopyKeys(t *testing.T) {
+	tests := []struct {
+		name string
+		src  map[int]int
+		keys []int
+		want map[int]int
+	}{
+		{
+			"nil",
+			nil,
+			nil,
+			nil,
+		},
+		{
+			"all empty",
+			map[int]int{},
+			[]int{},
+			map[int]int{},
+		},
+		{
+			"keys nil",
+			map[int]int{
+				1: 2,
+				3: 4,
+				5: 6,
+			},
+			nil,
+			map[int]int{},
+		},
+		{
+			"keys empty",
+			map[int]int{
+				1: 2,
+				3: 4,
+				5: 6,
+			},
+			[]int{},
+			map[int]int{},
+		},
+		{
+			"subset",
+			map[int]int{
+				1: 2,
+				3: 4,
+				5: 6,
+			},
+			[]int{1, 5},
+			map[int]int{
+				1: 2,
+				5: 6,
+			},
+		},
+		{
+			"superset",
+			map[int]int{
+				1: 2,
+				3: 4,
+				5: 6,
+			},
+			[]int{1, 5, 7, 9},
+			map[int]int{
+				1: 2,
+				5: 6,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := MapCopyKeys(tt.src, tt.keys...); !MapEqual(got, tt.want) {
+				t.Errorf("MapCopyKeys =\n%v\nwant\n%v", got, tt.want)
+			}
+		})
+	}
+}
