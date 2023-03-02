@@ -21,3 +21,8 @@ func Value[T any](pointer *T) (value T) {
 
 	return value
 }
+
+// PtrCopy copies a value behind pointer to a new pointer address.
+func PtrCopy[T any](pointer *T) *T {
+	return Ptr(Value(pointer))
+}
