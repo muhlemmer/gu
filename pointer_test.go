@@ -76,3 +76,31 @@ func ExampleValue() {
 
 	// Output: 0 foobar
 }
+
+func TestPtrCopy(t *testing.T) {
+	type args struct {
+		pointer *int
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "nil",
+			args: args{},
+		},
+		{
+			name: "value",
+			args: args{
+				Ptr(1),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PtrCopy(tt.args.pointer); got == tt.args.pointer {
+				t.Errorf("PtrCopy(): %v == %v", got, tt.args.pointer)
+			}
+		})
+	}
+}
