@@ -192,3 +192,25 @@ func TestMapCopyKeys(t *testing.T) {
 		})
 	}
 }
+
+func TestMapMerge(t *testing.T) {
+	src := map[int]int{
+		1: 2,
+		3: 4,
+		5: 6,
+	}
+	dst := map[int]int{
+		1: 99,
+		7: 8,
+	}
+	want := map[int]int{
+		1: 2,
+		3: 4,
+		5: 6,
+		7: 8,
+	}
+	MapMerge(src, dst)
+	if !MapEqual(dst, want) {
+		t.Errorf("MapCopyKeys =\n%v\nwant\n%v", dst, want)
+	}
+}
