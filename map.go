@@ -68,3 +68,11 @@ func MapCopyKeys[K comparable, V any](src map[K]V, keys ...K) map[K]V {
 
 	return dst
 }
+
+// MapMerge copies all entries from src in dst.
+// Any pre-existing keys in dst are overwritten.
+func MapMerge[K comparable, V any](src map[K]V, dst map[K]V) {
+	for k, v := range src {
+		dst[k] = v
+	}
+}
