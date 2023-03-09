@@ -78,29 +78,13 @@ func ExampleValue() {
 }
 
 func TestPtrCopy(t *testing.T) {
-	type args struct {
-		pointer *int
+	got := PtrCopy[int](nil)
+	if got != nil {
+		t.Errorf("PtrCopy(): expected nil, got %v", got)
 	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "nil",
-			args: args{},
-		},
-		{
-			name: "value",
-			args: args{
-				Ptr(1),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := PtrCopy(tt.args.pointer); got == tt.args.pointer {
-				t.Errorf("PtrCopy(): %v == %v", got, tt.args.pointer)
-			}
-		})
+	v := Ptr(7)
+	got = PtrCopy(v)
+	if got == v {
+		t.Errorf("PtrCopy(): %v == %v", v, got)
 	}
 }

@@ -23,6 +23,10 @@ func Value[T any](pointer *T) (value T) {
 }
 
 // PtrCopy copies a value behind pointer to a new pointer address.
+// Returns nil when the input is nil.
 func PtrCopy[T any](pointer *T) *T {
+	if pointer == nil {
+		return nil
+	}
 	return Ptr(Value(pointer))
 }
